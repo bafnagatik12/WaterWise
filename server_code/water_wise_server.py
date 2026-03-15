@@ -84,3 +84,37 @@ def get_countries_list():
     countries.append((country_name, country_code))
   return countries
 
+@anvil.server.callable
+def get_country_data(country_code):
+  return COUNTRIES_DATA.get(country_code)
+
+import anvil.server
+
+class water_wise_client(water_wise_clientTemplate):
+  def __init__(self, **properties):
+    self.init_components(**properties)
+
+    # Load dropdown countries
+    countries = anvil.server.call("get_countries_list")
+    self.drop_down_1.items = countries
+
+
+def drop_down_1_change(self, **event_args):
+
+  country_code = self.drop_down_1.selected_value
+
+  # Call server API
+  data = anvil.server.call("get_country_data", country_code)
+
+  # Save data in the form
+  self.country_data = data
+
+  # Update labels
+  if data:
+    self.label_country.text = data['country_name']
+    self.label_safety.text = f"Safety Score: {data['safety_score']}"
+    self.label_stress.text = f"Stress Level: {data['stress_level']}"
+    self.label_usage.text = f"Water Usage: {data['water_usage']}"
+
+
+
