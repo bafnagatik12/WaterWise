@@ -1,7 +1,7 @@
 import anvil.server
 import io
 import csv
-from anvil import app
+from anvil.files import data_files
 # This is a server module. It runs on the Anvil server,
 # rather than in the user's browser.
 #
