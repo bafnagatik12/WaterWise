@@ -1,46 +1,100 @@
 from ._anvil_designer import water_wise_clientTemplate
 from anvil import *
 import anvil.server
-import anvil.tables as tables
-import anvil.tables.query as q
-from anvil.tables import app_tables
 
 class water_wise_client(water_wise_clientTemplate):
   def __init__(self, **properties):
-    # Set Form properties and Data Bindings.
     self.init_components(**properties)
 
-    # Load countries into dropdown
-    self.load_countries()
-  def load_countries(self):
-    """Load countries into dropdown"""
-    try:
-      # Get countries from server
-      countries = anvil.server.call('get_countries_list')
+    self.country_data = None
 
-      # Set dropdown items
+    # Load dropdown items
+    self.load_countries()
+
+
+  def load_countries(self):
+    try:
+      countries = anvil.server.call("get_countries_list")
+
+      # dropdown format: (label, value)
       self.drop_down_1.items = countries
 
     except Exception as e:
-      print(f"Error loading countries: {e}")
+      print("Error loading countries:", e)
 
-  @handle('drop_down_1','change')
+  @handle("drop_down_1", "change")
   def drop_down_1_change(self, **event_args):
-    """This method is called when an item is selected"""
-    selected_country_code = self.drop_down_1.selected_value
+    print("dropdown function called")
 
-    if selected_country_code:
-      # Find the country name from the dropdown items
-      selected_country_name = None
-      for name, code in self.drop_down_1.items:
-        if code == selected_country_code:
-          selected_country_name = name
-          break
+    country_code = self.drop_down_1.selected_value
 
-      if selected_country_name:
-        self.label_2.text = f"Selected: {selected_country_name} ({selected_country_code})"
-    else:
-      self.label_2.text = "No country selected"
+    if not country_code:
+      return
 
+    # call server
+    data = anvil.server.call("get_country_data", country_code)
 
+    # save data locally
+    self.country_data = data
 
+    if data:
+
+      self.label_2.text = f"Selected: {data['country_name']} ({data['country_code']})"
+
+      self.label_country.text = data["country_name"]
+
+      self.label_safety.text = f"Safety Score: {data['safety_score']}"
+
+      self.label_stress.text = f"Stress Level: {data['stress_level']}"
+
+      self.label_usage.text = f"Average Water Usage: {data['water_usage']}"
+
+  @handle("button_1", "click")
+  def button_1_handler(self, **event_args):
+
+    self.label_6.text = ""
+    self.label_7.text = ""
+    self.label_8.text = ""
+
+    numberDays = self.text_box_1.text
+    numberShowers = self.text_box_2.text
+    averageDuration = self.text_box_3.text
+
+    # validation
+    if not numberDays:
+      self.label_6.text = "Please enter the number of days"
+      return
+
+    if not numberShowers:
+      self.label_7.text = "Please enter the number of showers"
+      return
+
+    if not averageDuration:
+      self.label_8.text = "Please enter the average shower duration"
+      return
+
+    if not self.country_data:
+      alert("Please select a country first")
+      return
+
+    try:
+      days = int(numberDays)
+      showers = int(numberShowers)
+      duration = float(averageDuration)
+    except:
+      alert("Enter valid numbers")
+      return
+
+    country_code = self.country_data["country_code"]
+
+    #  call server function
+    donation = anvil.server.call(
+      "get_donation_amount",
+      country_code,
+      days,
+      showers,
+      duration
+    )
+
+    # display result
+    self.label_9.text = f"Suggested Donation: ${donation:.2f}"

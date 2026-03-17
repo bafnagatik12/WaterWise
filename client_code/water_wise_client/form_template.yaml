@@ -4,7 +4,8 @@ components:
     name: label_1
     properties: {text: Select Country}
     type: Label
-  - layout_properties: {grid_position: 'UHJTMV,FLPHYU'}
+  - event_bindings: {}
+    layout_properties: {grid_position: 'UHJTMV,FLPHYU'}
     name: drop_down_1
     properties: {}
     type: DropDown
@@ -26,6 +27,54 @@ components:
     type: Label
   - layout_properties: {grid_position: 'LJLIJC,TLXRIU'}
     name: label_usage
+    properties: {}
+    type: Label
+  - layout_properties: {grid_position: 'OLBVPM,GOICJK'}
+    name: donation
+    properties: {bold: true, font_size: 20, text: Calculate a suggested donation}
+    type: Label
+  - layout_properties: {grid_position: 'YBRAMI,RBIHLS'}
+    name: label_3
+    properties: {text: Number of Days Traveling}
+    type: Label
+  - layout_properties: {grid_position: 'YBRAMI,MQZZEM UVZMEA,BOBJCS'}
+    name: text_box_1
+    properties: {placeholder: days, type: number}
+    type: TextBox
+  - layout_properties: {grid_position: 'YBRAMI,MQZZEM QYFPCQ,AAJHBN'}
+    name: label_6
+    properties: {}
+    type: Label
+  - layout_properties: {grid_position: 'CCLSXK,YWJSJZ'}
+    name: label_4
+    properties: {text: Number of Showers While Traveling}
+    type: Label
+  - layout_properties: {grid_position: 'CCLSXK,LNTRNA CPGGJF,HNIFQM'}
+    name: text_box_2
+    properties: {placeholder: showers, type: number}
+    type: TextBox
+  - layout_properties: {grid_position: 'CCLSXK,LNTRNA YZSAWN,YYTLJB'}
+    name: label_7
+    properties: {}
+    type: Label
+  - layout_properties: {grid_position: 'WNQBOI,YSIGAF'}
+    name: label_5
+    properties: {text: Average Duration of Each Shower}
+    type: Label
+  - layout_properties: {grid_position: 'WNQBOI,RAQYNK TEJMPK,RLHNKX'}
+    name: text_box_3
+    properties: {placeholder: shower duration, type: number}
+    type: TextBox
+  - layout_properties: {grid_position: 'WNQBOI,RAQYNK ZXJEWR,FOAEXN'}
+    name: label_8
+    properties: {}
+    type: Label
+  - layout_properties: {grid_position: 'UDNULD,YEKGCA'}
+    name: button_1
+    properties: {text: Calculate}
+    type: Button
+  - layout_properties: {grid_position: 'FBONEH,QMGEDT'}
+    name: label_9
     properties: {}
     type: Label
   layout_properties: {slot: default}

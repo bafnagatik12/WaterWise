@@ -48,73 +48,68 @@ COUNTRY_CODES = {
     'URY': 'Uruguay', 'UZB': 'Uzbekistan', 'VNM': 'Vietnam', 'ZMB': 'Zambia', 'ZWE': 'Zimbabwe'
 }
 
-# Load country data from CSV file in Data Files
 def load_country_data():
-  """Load country data from CSV file stored in Anvil Data Files"""
+  print("load country data called")
   try:
-    # Get the CSV file from Data Files
-    csv_file = app.get_asset('WaterWise_db (1).csv')
+    with data_files.open('WaterWise_db (1).csv', 'rb') as f:
+      csv_content = f.read().decode('utf-8')
+      csv_reader = csv.DictReader(io.StringIO(csv_content))
 
-    # Read the CSV content
-    csv_content = csv_file.get_bytes().decode('utf-8')
-    csv_reader = csv.DictReader(io.StringIO(csv_content))
+      countries_data = {}
 
-    countries_data = {}
-    for row in csv_reader:
-      country_code = row['Country_Code']
-      country_name = COUNTRY_CODES.get(country_code, country_code)
+      for row in csv_reader:
+        country_code = row['Country_Code']
+        country_name = COUNTRY_CODES.get(country_code, country_code)
 
-      countries_data[country_code] = {
-        'country_code': country_code,
-        'country_name': country_name,
-        'safety_score': float(row['Safety_Score']) if row['Safety_Score'] else 0,
-        'stress_level': float(row['Stress_Level']) if row['Stress_Level'] else 0,
-        'water_usage': float(row['Average_Usage']) if row['Average_Usage'] else 0
-      }
+        countries_data[country_code] = {
+          "country_code": country_code,
+          "country_name": country_name,
+          "safety_score": float(row['Safety_Score']) if row['Safety_Score'] else 0,
+          "stress_level": float(row['Stress_Level']) if row['Stress_Level'] else 0,
+          "water_usage": float(row['Average_Usage']) if row['Average_Usage'] else 0,
+          "water_value": float(row['Water_Value']) if row['Water_Value'] else 0
+        }
+      print(countries_data)
+      return countries_data
 
-    return countries_data
   except Exception as e:
-    print(f"Error loading CSV data: {str(e)}")
-    return {}# Cache the data when server starts
+    print("Error loading CSV data:", e)
+    return {}
+
 COUNTRIES_DATA = load_country_data()
+
 @anvil.server.callable
 def get_countries_list():
   countries = []
-  for country_code, country_name in COUNTRY_CODES.items():
-    countries.append((country_name, country_code))
+  for code, name in COUNTRY_CODES.items():
+    countries.append((name, code))
   return countries
-
+#need another callable function, input of country code, number of days, number of showers, and shower duration; output would be the dollar amount
 @anvil.server.callable
 def get_country_data(country_code):
   return COUNTRIES_DATA.get(country_code)
+@anvil.server.callable
+def get_donation_amount(country_code, days, showers, avgShowerDuration):
 
-import anvil.server
+  if country_code not in COUNTRIES_DATA:
+    return 0
 
-class water_wise_client(water_wise_clientTemplate):
-  def __init__(self, **properties):
-    self.init_components(**properties)
+  # constants
+  daily_base_usage = 0.10
+  shower_rate = 0.009
 
-    # Load dropdown countries
-    countries = anvil.server.call("get_countries_list")
-    self.drop_down_1.items = countries
+  # calculations
+  base_usage = days * daily_base_usage
+  shower_usage = showers * avgShowerDuration * shower_rate
+  total_usage = base_usage + shower_usage
 
+  # get water value
+  country_value = COUNTRIES_DATA[country_code].get("water_value", 1)
 
-def drop_down_1_change(self, **event_args):
+  water_value = total_usage * country_value
 
-  country_code = self.drop_down_1.selected_value
+  print("Total Water Usage (m^3):", total_usage)
+  print("Calculated Water Value:", water_value)
 
-  # Call server API
-  data = anvil.server.call("get_country_data", country_code)
-
-  # Save data in the form
-  self.country_data = data
-
-  # Update labels
-  if data:
-    self.label_country.text = data['country_name']
-    self.label_safety.text = f"Safety Score: {data['safety_score']}"
-    self.label_stress.text = f"Stress Level: {data['stress_level']}"
-    self.label_usage.text = f"Water Usage: {data['water_usage']}"
-
-
+  return water_value
 
