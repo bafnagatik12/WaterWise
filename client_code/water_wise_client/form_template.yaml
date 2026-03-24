@@ -9,10 +9,6 @@ components:
     name: drop_down_1
     properties: {}
     type: DropDown
-  - layout_properties: {grid_position: 'ZENNJP,RSRFSJ'}
-    name: label_2
-    properties: {}
-    type: Label
   - layout_properties: {grid_position: 'BHKOWC,WFYFVA'}
     name: label_country
     properties: {}
@@ -77,6 +73,10 @@ components:
     name: label_9
     properties: {}
     type: Label
+  - layout_properties: {grid_position: 'TBFNNK,MHDFRD'}
+    name: label_10
+    properties: {}
+    type: Label
   layout_properties: {slot: default}
   name: content_panel
   properties: {col_widths: '{}'}
@@ -85,6 +85,10 @@ components:
   name: navbar_links
   properties: {}
   type: FlowPanel
+- layout_properties: {slot: title}
+  name: image_1
+  properties: {height: '100', source: _/theme/a8f3add8-4356-4913-8fc4-cd658da2352c.png, visible: true}
+  type: Image
 container:
   properties: {html: '@theme:standard-page.html'}
   type: HtmlTemplate

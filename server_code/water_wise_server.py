@@ -66,7 +66,7 @@ def load_country_data():
           "country_name": country_name,
           "safety_score": float(row['Safety_Score']) if row['Safety_Score'] else 0,
           "stress_level": float(row['Stress_Level']) if row['Stress_Level'] else 0,
-          "water_usage": float(row['Average_Usage']) if row['Average_Usage'] else 0,
+          "water_usage": (float(row['Average_Usage']) * 10**9 / float(row['Population']) / 365) if row['Average_Usage'] and row['Population'] else 0,
           "water_value": float(row['Water_Value']) if row['Water_Value'] else 0
         }
       print(countries_data)
@@ -113,3 +113,22 @@ def get_donation_amount(country_code, days, showers, avgShowerDuration):
 
   return water_value
 
+@anvil.server.callable
+def calculate_user_daily_usage(days, showers, avgShowerDuration):
+
+  # constants (same as your donation function)
+  daily_base_usage = 0.10
+  shower_rate = 0.009
+
+  # total usage over period
+  base_usage = days * daily_base_usage
+  shower_usage = showers * avgShowerDuration * shower_rate
+  total_usage = base_usage + shower_usage
+
+  # average per day
+  if days == 0:
+    return 0
+
+  daily_avg = total_usage / days
+
+  return daily_avg

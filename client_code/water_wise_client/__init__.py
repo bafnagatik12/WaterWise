@@ -39,16 +39,47 @@ class water_wise_client(water_wise_clientTemplate):
 
     if data:
 
-      self.label_2.text = f"Selected: {data['country_name']} ({data['country_code']})"
-
+      
       self.label_country.text = data["country_name"]
 
-      self.label_safety.text = f"Safety Score: {data['safety_score']}"
-
-      self.label_stress.text = f"Stress Level: {data['stress_level']}"
-
-      self.label_usage.text = f"Average Water Usage: {data['water_usage']}"
-
+            # --- FORMAT VALUES ---
+      safety = int(data['safety_score']) if data['safety_score'] else None
+      stress_percent = round(data['stress_level'], 3)
+      usage = round(data['water_usage'], 3)
+      
+      # --- SAFETY SCORE ---
+      if safety:
+        self.label_safety.text = f"Safety Score: {safety}/5"
+      else:
+        self.label_safety.text = "Safety Score: —/5"
+      
+      # color logic
+      if safety in [1, 2]:
+        self.label_safety.foreground = "red"
+      elif safety == 3:
+        self.label_safety.foreground = "orange"
+      elif safety in [4, 5]:
+        self.label_safety.foreground = "green"
+      
+      # user-friendly description
+      self.label_safety.text += "\nHow safe the water is to use. Lower scores mean the water may not be safe, while higher scores mean it is cleaner and safer."
+      
+      # --- STRESS LEVEL ---
+      self.label_stress.text = f"Water Stress Level: {stress_percent}%"
+      
+      if stress_percent < 33:
+        self.label_stress.foreground = "green"
+      elif stress_percent <= 66:
+        self.label_stress.foreground = "orange"
+      else:
+        self.label_stress.foreground = "red"
+      
+      self.label_stress.text += "\nShows how much of a country’s water supply is being used. Higher values mean the country is using more of its available water."
+      
+      # --- WATER USAGE ---
+      self.label_usage.text = f"Average Water Usage: {usage} m³/person/day"
+      
+      self.label_usage.text += "\nThe average amount of freshwater that a person in this country uses per day. Larger numbers mean higher overall water demand."
   @handle("button_1", "click")
   def button_1_handler(self, **event_args):
 
@@ -98,3 +129,24 @@ class water_wise_client(water_wise_clientTemplate):
 
     # display result
     self.label_9.text = f"Suggested Donation: ${donation:.2f}"
+
+
+    # --- USER DAILY USAGE ---
+    user_daily = anvil.server.call(
+      "calculate_user_daily_usage",
+      days,
+      showers,
+      duration
+    )
+    
+    # --- COUNTRY DAILY USAGE ---
+    country_yearly = self.country_data["water_usage"]
+    
+    # --- DISPLAY TEXT (THIS FIXES WARNING) ---
+    self.label_10.text = (
+      f"Your Daily Water Use: {user_daily:.3f} m³/day\n"
+      f"Average Daily Water Usage of a Person in this Country: {country_yearly:.3f} m³/day"
+    )
+
+
+  
