@@ -27,7 +27,7 @@ components:
     type: Label
   - layout_properties: {grid_position: 'OLBVPM,GOICJK'}
     name: donation
-    properties: {bold: true, font_size: 20, text: Calculate a suggested donation}
+    properties: {bold: true, font_size: 20, text: Calculate a suggested donation per person}
     type: Label
   - layout_properties: {grid_position: 'YBRAMI,RBIHLS'}
     name: label_3

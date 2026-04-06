@@ -128,7 +128,7 @@ class water_wise_client(water_wise_clientTemplate):
     )
 
     # display result
-    self.label_9.text = f"Suggested Donation: ${donation:.2f}"
+    self.label_9.text = f"Suggested Donation to Offset Water Use: ${donation:.2f}"
 
 
     # --- USER DAILY USAGE ---
