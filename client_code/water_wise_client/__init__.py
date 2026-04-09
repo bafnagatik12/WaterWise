@@ -1,6 +1,8 @@
 from ._anvil_designer import water_wise_clientTemplate
 from anvil import *
+import plotly.graph_objects as go
 import anvil.server
+
 
 class water_wise_client(water_wise_clientTemplate):
   def __init__(self, **properties):
@@ -18,6 +20,7 @@ class water_wise_client(water_wise_clientTemplate):
 
       # dropdown format: (label, value)
       self.drop_down_1.items = countries
+      self.drop_down_1.selected_value = None
 
     except Exception as e:
       print("Error loading countries:", e)
@@ -45,7 +48,7 @@ class water_wise_client(water_wise_clientTemplate):
             # --- FORMAT VALUES ---
       safety = int(data['safety_score']) if data['safety_score'] else None
       stress_percent = round(data['stress_level'], 3)
-      usage = round(data['water_usage'], 3)
+      usage = (round(data['water_usage'], 3))*1000
       
       # --- SAFETY SCORE ---
       if safety:
@@ -77,9 +80,10 @@ class water_wise_client(water_wise_clientTemplate):
       self.label_stress.text += "\nShows how much of a country’s water supply is being used. Higher values mean the country is using more of its available water."
       
       # --- WATER USAGE ---
-      self.label_usage.text = f"Average Water Usage: {usage} m³/person/day"
+      self.label_usage.text = f"Average Water Usage: {usage} Liters/person/day"
       
-      self.label_usage.text += "\nThe average amount of freshwater that a person in this country uses per day. Larger numbers mean higher overall water demand."
+      self.label_usage.text += "\nThe average amount of freshwater per capita that this country uses per day. Larger numbers mean higher overall water demand."
+  #deals with user input related to calculate button click
   @handle("button_1", "click")
   def button_1_handler(self, **event_args):
 
@@ -132,21 +136,40 @@ class water_wise_client(water_wise_clientTemplate):
 
 
     # --- USER DAILY USAGE ---
-    user_daily = anvil.server.call(
+    user_daily = (anvil.server.call(
       "calculate_user_daily_usage",
       days,
       showers,
       duration
-    )
+    ))*1000
     
     # --- COUNTRY DAILY USAGE ---
-    country_yearly = self.country_data["water_usage"]
+    country_yearly = (self.country_data["water_usage"])*1000
     
     # --- DISPLAY TEXT (THIS FIXES WARNING) ---
-    self.label_10.text = (
-      f"Your Daily Water Use: {user_daily:.3f} m³/day\n"
-      f"Average Daily Water Usage of a Person in this Country: {country_yearly:.3f} m³/day"
+    
+    self.show_chart(user_daily, country_yearly)
+  def show_chart(self, traveler_use, local_use):
+
+    fig = go.Figure(
+      data=[
+        go.Bar(
+          x=["Your Daily Water Use", "Average Daily Water Usage of a Person in this Country"],
+          y=[traveler_use, local_use],
+          text = [round(traveler_use, 3), round(local_use, 3)],
+          textposition = "outside",
+          marker_color=["#1f77b4", "#ff7f0e"] 
+        )
+      ]
     )
+
+    fig.update_layout(
+      title="Daily Water Use Comparison",
+      yaxis_title="Liters per Day"
+    )
+
+    self.plot_1.figure = fig
+
 
 
   

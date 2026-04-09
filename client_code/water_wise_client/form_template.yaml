@@ -7,7 +7,7 @@ components:
   - event_bindings: {}
     layout_properties: {grid_position: 'UHJTMV,FLPHYU'}
     name: drop_down_1
-    properties: {}
+    properties: {include_placeholder: true, placeholder: Select a country}
     type: DropDown
   - layout_properties: {grid_position: 'BHKOWC,WFYFVA'}
     name: label_country
@@ -73,10 +73,10 @@ components:
     name: label_9
     properties: {}
     type: Label
-  - layout_properties: {grid_position: 'TBFNNK,MHDFRD'}
-    name: label_10
+  - layout_properties: {grid_position: 'GBLVVO,RAYGGW'}
+    name: plot_1
     properties: {}
-    type: Label
+    type: Plot
   layout_properties: {slot: default}
   name: content_panel
   properties: {col_widths: '{}'}

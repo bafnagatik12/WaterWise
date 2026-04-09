@@ -95,7 +95,7 @@ def get_donation_amount(country_code, days, showers, avgShowerDuration):
     return 0
 
   # constants
-  daily_base_usage = 0.10
+  daily_base_usage = 0.3
   shower_rate = 0.009
 
   # calculations
@@ -117,7 +117,7 @@ def get_donation_amount(country_code, days, showers, avgShowerDuration):
 def calculate_user_daily_usage(days, showers, avgShowerDuration):
 
   # constants (same as your donation function)
-  daily_base_usage = 0.10
+  daily_base_usage = 0.3
   shower_rate = 0.009
 
   # total usage over period
