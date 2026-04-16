@@ -1,88 +1,176 @@
-# About This [Anvil](https://anvil.works/?utm_source=github:app_README) App
+# WaterWise Travel Dashboard 🌍💧
 
-### Build web apps with nothing but Python.
+## Overview
 
-The app in this repository is built with [Anvil](https://anvil.works?utm_source=github:app_README), the framework for building web apps with nothing but Python. You can clone this app into your own Anvil account to use and modify.
+The **WaterWise Travel Dashboard** is an interactive application designed to help travelers understand their water usage in different countries and its environmental impact. The app provides country-specific water data, calculates personal water consumption based on user inputs, and suggests a donation amount to offset that usage.
 
-Below, you will find:
-- [How to open this app](#opening-this-app-in-anvil-and-getting-it-online) in Anvil and deploy it online
-- Information [about Anvil](#about-anvil)
-- And links to some handy [documentation and tutorials](#tutorials-and-documentation)
+---
 
-## Opening this app in Anvil and getting it online
+## Features
 
-### Cloning the app
+### 🌐 Country Selection
 
-Go to the [Anvil Editor](https://anvil.works/build?utm_source=github:app_README) (you might need to sign up for a free account) and click on “Clone from GitHub” (underneath the “Blank App” option):
+* Users can select from a list of countries via a dropdown menu.
+* The app dynamically loads country-specific data from the backend.
 
-<img src="https://anvil.works/docs/version-control/img/git/clone-from-github.png" alt="Clone from GitHub"/>
+### 📊 Water Metrics Display
 
-Enter the URL of this GitHub repository. If you're not yet logged in, choose "GitHub credentials" as the authentication method and click "Connect to GitHub".
+For each selected country, the dashboard displays:
 
-<img src="https://anvil.works/docs/version-control/img/git/clone-app-from-git.png" alt="Clone App from Git modal"/>
+* **Water Safety Score (1–5)**
 
-Finally, click "Clone App".
+  * Color-coded (Red, Orange, Green) for quick interpretation
+* **Water Stress Level (%)**
 
-This app will then be in your Anvil account, ready for you to run it or start editing it! **Any changes you make will be automatically pushed back to this repository, if you have permission!** You might want to [make a new branch](https://anvil.works/docs/version-control?utm_source=github:app_README).
+  * Indicates how much of the country’s water supply is being used
+* **Average Daily Water Usage (Liters/person/day)**
 
-### Running the app yourself:
+  * Converted from national-level data to per-capita daily usage
 
-Find the **Run** button at the top-right of the Anvil editor:
+---
 
-<img src="https://anvil.works/docs/img/run-button-new-ide.png"/>
+### 🧮 Personalized Water Usage Calculator
 
+Users input:
 
-### Publishing the app on your own URL
+* Number of travel days
+* Number of showers
+* Average shower duration
 
-Now you've cloned the app, you can [deploy it on the internet with two clicks](https://anvil.works/docs/deployment/quickstart?utm_source=github:app_README)! Find the **Publish** button at the top-right of the editor:
+The app:
 
-<img src="https://anvil.works/docs/deployment/img/environments/publish-button.png"/>
+* Estimates total water usage
+* Calculates **daily water consumption**
+* Generates a **suggested donation amount** based on country-specific water value
 
-When you click it, you will see the Publish dialog:
+---
 
-<img src="https://anvil.works/docs/deployment/img/quickstart/empty-environments-dialog.png"/>
+### 📈 Data Visualization
 
-Click **Publish This App**, and you will see that your app has been deployed at a new, public URL:
+* Displays a **bar chart comparison** of:
 
-<img src="https://anvil.works/docs/deployment/img/quickstart/default-public-environment.png"/>
+  * Traveler’s daily water usage
+  * Local resident’s average daily usage
+* Built using Plotly for clear and interactive visualization
 
-That's it - **your app is now online**. Click the link and try it!
+---
 
-## About Anvil
+## Data Source & Processing
 
-If you’re new to Anvil, welcome! Anvil is a platform for building full-stack web apps with nothing but Python. No need to wrestle with JS, HTML, CSS, Python, SQL and all their frameworks – just build it all in Python.
+* Data is sourced from global water datasets (e.g., AQUASTAT).
+* Raw data is cleaned and processed before being used in the app:
 
-<figure>
-<figcaption><h3>Learn About Anvil In 80 Seconds👇</h3></figcaption>
-<a href="https://www.youtube.com/watch?v=3V-3g1mQ5GY" target="_blank">
-<img
-  src="https://anvil-website-static.s3.eu-west-2.amazonaws.com/anvil-in-80-seconds-YouTube.png"
-  alt="Anvil In 80 Seconds"
-/>
-</a>
-</figure>
-<br><br>
+  * Standardized country codes
+  * Handled missing values
+  * Converted total national water usage into **per capita daily usage**
 
-[![Try Anvil Free](https://anvil-website-static.s3.eu-west-2.amazonaws.com/mark-complete.png)](https://anvil.works?utm_source=github:app_README)
+### Key Transformation:
 
-To learn more about Anvil, visit [https://anvil.works](https://anvil.works?utm_source=github:app_README).
+[
+"water_usage": (float(row['Average_Usage']) * 10**9 / float(row['Population']) / 365)
+]
 
-## Tutorials and documentation
+* Final cleaned dataset is stored as a CSV file and loaded into the backend.
 
-### Tutorials
+---
 
-If you are just starting out with Anvil, why not **[try the 10-minute Feedback Form tutorial](https://anvil.works/learn/tutorials/feedback-form?utm_source=github:app_README)**? It features step-by-step tutorials that will introduce you to the most important parts of Anvil.
+## System Architecture
 
-Anvil has tutorials on:
-- [Building Dashboards](https://anvil.works/learn/tutorials/data-science#dashboarding?utm_source=github:app_README)
-- [Multi-User Applications](https://anvil.works/learn/tutorials/multi-user-apps?utm_source=github:app_README)
-- [Building Web Apps with an External Database](https://anvil.works/learn/tutorials/external-database?utm_source=github:app_README)
-- [Deploying Machine Learning Models](https://anvil.works/learn/tutorials/deploy-machine-learning-model?utm_source=github:app_README)
-- [Taking Payments with Stripe](https://anvil.works/learn/tutorials/stripe?utm_source=github:app_README)
-- And [much more....](https://anvil.works/learn/tutorials?utm_source=github:app_README)
+### Frontend (Client)
 
-### Reference Documentation
+* Built using **Anvil**
+* Handles:
 
-The Anvil reference documentation provides comprehensive information on how to use Anvil to build web applications. You can find the documentation [here](https://anvil.works/docs/overview?utm_source=github:app_README).
+  * User interaction
+  * Input validation
+  * Display of results and charts
 
-If you want to get to the basics as quickly as possible, each section of this documentation features a [Quick-Start Guide](https://anvil.works/docs/overview/quickstarts?utm_source=github:app_README).
+### Backend (Server)
+
+* Python-based server functions using `anvil.server.call`
+* Responsible for:
+
+  * Loading and storing country data
+  * Performing calculations
+  * Returning results to the frontend
+
+---
+
+## Core Functionalities
+
+### 1. Country Data Retrieval
+
+```python
+@anvil.server.callable
+def get_country_data(country_code):
+  return COUNTRIES_DATA.get(country_code)
+```
+
+---
+
+### 2. Donation Calculation
+
+```python
+total_usage = base_usage + shower_usage
+water_value = total_usage * country_value
+```
+
+* Uses:
+
+  * Base daily water usage
+  * Shower usage (rate × duration)
+  * Country-specific water value
+
+---
+
+### 3. Daily Usage Calculation
+
+```python
+daily_avg = total_usage / days
+```
+
+* Computes average daily water consumption for visualization
+
+---
+
+## Input Validation
+
+The app ensures:
+
+* All input fields are filled
+* Inputs are valid numeric values
+* A country is selected before calculation
+
+---
+
+## User Experience Design
+
+* Color-coded indicators for intuitive understanding
+* Descriptive text explanations for each metric
+* Clean and simple interface for accessibility
+
+---
+
+## Challenges
+
+* Standardizing country names and codes across datasets
+* Converting large-scale national data into usable per-person metrics
+* Handling missing or inconsistent data
+* Ensuring smooth communication between frontend and backend
+
+---
+
+## Future Improvements
+
+* Improve accuracy of water valuation model
+* Add more granular (regional/city-level) data
+* Enhance UI/UX design
+* Expand to mobile compatibility
+
+---
+
+## Conclusion
+
+The WaterWise Travel Dashboard bridges data science and sustainability by transforming complex water usage data into an interactive and user-friendly tool. It empowers travelers to make more informed and responsible decisions about their water consumption.
+
+---
