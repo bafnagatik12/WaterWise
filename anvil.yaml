@@ -18,8 +18,8 @@ db_schema:
     server: full
     title: Files
 dependencies: []
-name: WaterWIse
-package_name: WaterWIse
+name: WaterWise
+package_name: WaterWise
 renamed: true
 runtime_options:
   client_version: '3'
