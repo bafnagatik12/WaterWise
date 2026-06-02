@@ -80,9 +80,8 @@ class water_wise_client(water_wise_clientTemplate):
       self.label_stress.text += "\nShows how much of a country’s water supply is being used. Higher values mean the country is using more of its available water."
       
       # --- WATER USAGE ---
-      self.label_usage.text = f"Average Water Usage: {usage} Liters/person/day"
-      
-      self.label_usage.text += "\nThe average amount of freshwater per capita that a person in this country uses per day. Larger numbers mean higher overall water demand."
+    self.label_usage.text = f"Average Water Usage: {usage} Liters/person/day"
+    self.label_usage.text += "\nThe average total freshwater withdrawn per person per day in this country, including agricultural, industrial, and household use."
   #deals with user input related to calculate button click
   @handle("button_1", "click")
   def button_1_handler(self, **event_args):
