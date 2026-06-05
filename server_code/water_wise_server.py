@@ -2,18 +2,7 @@ import anvil.server
 import io
 import csv
 from anvil.files import data_files
-# This is a server module. It runs on the Anvil server,
-# rather than in the user's browser.
-#
-# To allow anvil.server.call() to call functions here, we mark
-# them with @anvil.server.callable.
-# Here is an example - you can replace it with your own:
-#
-# @anvil.server.callable
-# def say_hello(name):
-#   print("Hello, " + name + "!")
-#   return 42
-#
+
 COUNTRY_CODES = {
   'AFG': 'Afghanistan', 'ALB': 'Albania', 'DZA': 'Algeria', 'AGO': 'Angola', 'ATG': 'Antigua and Barbuda',
   'ARG': 'Argentina', 'ARM': 'Armenia', 'AUS': 'Australia', 'AUT': 'Austria', 'AZE': 'Azerbaijan',
@@ -45,8 +34,9 @@ COUNTRY_CODES = {
   'THA': 'Thailand', 'TLS': 'Timor-Leste', 'TGO': 'Togo', 'TTO': 'Trinidad and Tobago',
   'TUN': 'Tunisia', 'TUR': 'Turkey', 'TKM': 'Turkmenistan', 'UGA': 'Uganda', 'UKR': 'Ukraine',
   'ARE': 'United Arab Emirates', 'GBR': 'United Kingdom', 'TZA': 'Tanzania', 'USA': 'United States',
-    'URY': 'Uruguay', 'UZB': 'Uzbekistan', 'VNM': 'Vietnam', 'ZMB': 'Zambia', 'ZWE': 'Zimbabwe'
+  'URY': 'Uruguay', 'UZB': 'Uzbekistan', 'VNM': 'Vietnam', 'ZMB': 'Zambia', 'ZWE': 'Zimbabwe'
 }
+
 
 def load_country_data():
   print("load country data called")
@@ -54,13 +44,10 @@ def load_country_data():
     with data_files.open('WaterWise_db (1).csv', 'rb') as f:
       csv_content = f.read().decode('utf-8')
       csv_reader = csv.DictReader(io.StringIO(csv_content))
-
       countries_data = {}
-
       for row in csv_reader:
         country_code = row['Country_Code']
         country_name = COUNTRY_CODES.get(country_code, country_code)
-
         countries_data[country_code] = {
           "country_code": country_code,
           "country_name": country_name,
@@ -71,12 +58,13 @@ def load_country_data():
         }
       print(countries_data)
       return countries_data
-
   except Exception as e:
     print("Error loading CSV data:", e)
     return {}
 
+
 COUNTRIES_DATA = load_country_data()
+
 
 @anvil.server.callable
 def get_countries_list():
@@ -84,51 +72,79 @@ def get_countries_list():
   for code, name in COUNTRY_CODES.items():
     countries.append((name, code))
   return countries
-#need another callable function, input of country code, number of days, number of showers, and shower duration; output would be the dollar amount
+
+
 @anvil.server.callable
 def get_country_data(country_code):
   return COUNTRIES_DATA.get(country_code)
+
+
 @anvil.server.callable
 def get_donation_amount(country_code, days, showers, avgShowerDuration):
-
   if country_code not in COUNTRIES_DATA:
     return 0
 
-  # constants
-  daily_base_usage = 0.3
-  shower_rate = 0.009
+  country = COUNTRIES_DATA[country_code]
 
-  # calculations
-  base_usage = days * daily_base_usage
-  shower_usage = showers * avgShowerDuration * shower_rate
-  total_usage = base_usage + shower_usage
+  # Full daily footprint in m3 — same components as the chart
+  shower_daily_m3 = (showers * avgShowerDuration * 9) / days / 1000
+  hygiene_daily_m3 = 0.080
+  food_daily_m3 = 2.500
+  hotel_daily_m3 = 0.150
 
-  # get water value
-  country_value = COUNTRIES_DATA[country_code].get("water_value", 1)
+  total_daily_m3 = shower_daily_m3 + hygiene_daily_m3 + food_daily_m3 + hotel_daily_m3
+  total_m3 = total_daily_m3 * days
 
-  water_value = total_usage * country_value
+  # NGO delivery cost baseline: $2.50/m3
+  base_cost = 2.50
 
-  print("Total Water Usage (m^3):", total_usage)
-  print("Calculated Water Value:", water_value)
+  stress = country.get("stress_level", 10)
+  if stress > 100:
+    scarcity = 2.5
+  elif stress > 50:
+    scarcity = 1.8
+  elif stress > 20:
+    scarcity = 1.3
+  else:
+    scarcity = 1.0
 
-  return water_value
+  safety = country.get("safety_score", 3)
+  safety_factor = 1.0 + (5 - safety) * 0.15
+
+  donation = total_m3 * base_cost * scarcity * safety_factor
+  return round(donation, 2)
+
 
 @anvil.server.callable
-def calculate_user_daily_usage(days, showers, avgShowerDuration):
-
-  # constants (same as your donation function)
-  daily_base_usage = 1
-  shower_rate = 0.009
-
-  # total usage over period
-  base_usage = days * daily_base_usage
-  shower_usage = showers * avgShowerDuration * shower_rate
-  total_usage = base_usage + shower_usage
-
-  # average per day
+def calculate_traveler_footprint_breakdown(days, showers, avgShowerDuration):
+  """
+  Returns a daily water footprint breakdown in liters.
+  Includes direct use AND virtual water (food, hotel) so the comparison
+  to the country's total footprint is apples-to-apples.
+  """
   if days == 0:
-    return 0
+    return {"shower": 0, "hygiene": 0, "food": 0, "hotel": 0, "total": 0}
 
-  daily_avg = total_usage / days
+  # Direct water — showers
+  shower_daily = (showers * avgShowerDuration * 9) / days  # liters per day
 
-  return daily_avg
+  # Direct water — hygiene (drinking, sink, toilet)
+  hygiene_daily = 80  # L/day
+
+  # Virtual water in food consumed while traveling
+  # Source: UN Water / Water Footprint Network — global avg diet ~2,500 L/day
+  food_daily = 2500  # L/day
+
+  # Hotel and accommodation services (laundry, pool, cleaning, kitchen)
+  # Source: Cornell Hotel Sustainability Benchmarking ~150-200 L/guest/day
+  hotel_daily = 150  # L/day
+
+  total = shower_daily + hygiene_daily + food_daily + hotel_daily
+
+  return {
+    "shower": round(shower_daily, 1),
+    "hygiene": float(hygiene_daily),
+    "food": float(food_daily),
+    "hotel": float(hotel_daily),
+    "total": round(total, 1)
+  }
