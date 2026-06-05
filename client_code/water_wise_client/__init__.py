@@ -50,13 +50,17 @@ class water_wise_client(water_wise_clientTemplate):
       self.label_safety.text += "\nHow safe the water is to use. Lower scores mean the water may not be safe, while higher scores mean it is cleaner and safer."
 
       self.label_stress.text = "Water Stress Level: " + str(stress_percent) + "%"
-      if stress_percent < 33:
+      if stress_percent < 25:
         self.label_stress.foreground = "green"
-      elif stress_percent <= 66:
+      elif stress_percent <= 100:
         self.label_stress.foreground = "orange"
       else:
         self.label_stress.foreground = "red"
-      self.label_stress.text += "\nShows how much of a country's water supply is being used. Higher values mean the country is using more of its available water."
+
+      if stress_percent > 100:
+        self.label_stress.text += "\nThis country withdraws more water than nature replenishes — it relies on desalination or depleting groundwater to meet demand."
+      else:
+        self.label_stress.text += "\nMeasures how much of available freshwater is being withdrawn. Low % = abundant supply. Combine with the Safety Score above for the full picture."
 
       self.label_usage.text = "Average Water Usage: " + str(usage) + " Liters/person/day"
       self.label_usage.text += "\nThe average total freshwater withdrawn per person per day in this country, including agricultural, industrial, and household use."
@@ -115,21 +119,21 @@ class water_wise_client(water_wise_clientTemplate):
       name="Showers & Hygiene",
       x=[traveler_label, country_label],
       y=[direct, 0],
-      marker_color="#1a6faf"
+      marker_color="#003f7f"
     )
 
     bar2 = go.Bar(
       name="Food (Virtual Water)",
       x=[traveler_label, country_label],
       y=[food, 0],
-      marker_color="#5ba4d4"
+      marker_color="#2196F3"
     )
 
     bar3 = go.Bar(
       name="Hotel & Services",
       x=[traveler_label, country_label],
       y=[hotel, 0],
-      marker_color="#a8d4f0"
+      marker_color="#90CAF9"
     )
 
     bar4 = go.Bar(
@@ -144,7 +148,25 @@ class water_wise_client(water_wise_clientTemplate):
     fig.update_layout(
       barmode="stack",
       title="Your Daily Water Footprint vs. A Local Person's (Liters)",
-      yaxis_title="Liters per Day"
+      yaxis_title="Liters per Day",
+      annotations=[
+        dict(
+          x=traveler_label,
+          y=total,
+          text="<b>" + str(total) + " L/day</b>",
+          showarrow=False,
+          yshift=15,
+          font=dict(size=14)
+        ),
+        dict(
+          x=country_label,
+          y=country_val,
+          text="<b>" + str(country_val) + " L/day</b>",
+          showarrow=False,
+          yshift=15,
+          font=dict(size=14)
+        )
+      ]
     )
 
     self.plot_1.figure = fig

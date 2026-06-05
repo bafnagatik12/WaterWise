@@ -89,7 +89,7 @@ def get_donation_amount(country_code, days, showers, avgShowerDuration):
   country = COUNTRIES_DATA[country_code]
 
   # Full daily footprint in m3 — same components as the chart
-  shower_daily_m3 = (showers * avgShowerDuration * 9) / days / 1000
+  shower_daily_m3 = (showers * avgShowerDuration * 12) / days / 1000
   hygiene_daily_m3 = 0.080
   food_daily_m3 = 2.500
   hotel_daily_m3 = 0.150
@@ -119,28 +119,13 @@ def get_donation_amount(country_code, days, showers, avgShowerDuration):
 
 @anvil.server.callable
 def calculate_traveler_footprint_breakdown(days, showers, avgShowerDuration):
-  """
-  Returns a daily water footprint breakdown in liters.
-  Includes direct use AND virtual water (food, hotel) so the comparison
-  to the country's total footprint is apples-to-apples.
-  """
   if days == 0:
     return {"shower": 0, "hygiene": 0, "food": 0, "hotel": 0, "total": 0}
 
-  # Direct water — showers
-  shower_daily = (showers * avgShowerDuration * 9) / days  # liters per day
-
-  # Direct water — hygiene (drinking, sink, toilet)
-  hygiene_daily = 80  # L/day
-
-  # Virtual water in food consumed while traveling
-  # Source: UN Water / Water Footprint Network — global avg diet ~2,500 L/day
-  food_daily = 2500  # L/day
-
-  # Hotel and accommodation services (laundry, pool, cleaning, kitchen)
-  # Source: Cornell Hotel Sustainability Benchmarking ~150-200 L/guest/day
-  hotel_daily = 150  # L/day
-
+  shower_daily = (showers * avgShowerDuration * 12) / days
+  hygiene_daily = 80
+  food_daily = 2500
+  hotel_daily = 150
   total = shower_daily + hygiene_daily + food_daily + hotel_daily
 
   return {
