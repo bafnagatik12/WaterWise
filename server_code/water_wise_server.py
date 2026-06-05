@@ -70,7 +70,9 @@ COUNTRIES_DATA = load_country_data()
 def get_countries_list():
   countries = []
   for code, name in COUNTRY_CODES.items():
-    countries.append((name, code))
+    if code in COUNTRIES_DATA:
+      countries.append((name, code))
+  countries.sort(key=lambda x: x[0])
   return countries
 
 
